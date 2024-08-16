@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ToDo List</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300&display=swap');
+
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        h3.title {
+            background-color: #333;
+            color: #fff;
+            padding: 15px 20px;
+            text-align: left;
+            font-size: 20px;
+            font-weight: 300;
+            width: 400px;
+            margin-bottom: 0;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 20px;
+            width: 400px;
+        }
+
+        .intro {
+            font-size: 14px;
+            margin-bottom: 35px;
+            color: #555;
+            text-align: left;
+        }
+
+        .input-group {
+            display: flex;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            outline: none;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        ul.list-group {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li.list-group-item {
+            padding: 10px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-top: none;
+        }
+
+        li.list-group-item:first-child {
+            border-top: 1px solid #ddd;
+            border-radius: 5px 5px 0 0;
+        }
+
+        li.list-group-item:last-child {
+            border-radius: 0 0 5px 5px;
+        }
+
+        li.list-group-item span {
+            margin-right: 10px;
+            color: #333;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-right: 8px;
+        }
+
+        .btn-close img {
+            width: 18px;
+            height: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <h3 class="title">ToDo List</h3>
+    <div class="container">
+        <p class="intro">오늘 할일을 작성해 보세요.</p>
+        <div class="input-group">
+            <input id="item" type="text" placeholder="할일을 입력하세요.">
+            <button type="button" onclick="addItem()">추가</button>
+        </div>
+        <ul id="todolist" class="list-group"></ul>
+    </div>
+
+    <script>
+        function loadTodos() {
+            const todos = localStorage.getItem("todos");
+            return todos ? JSON.parse(todos) : [];
+        }
+
+        function saveTodos(todos) {
+            localStorage.setItem("todos", JSON.stringify(todos));
+        }
+
+        function renderTodos() {
+            const list = document.getElementById("todolist");
+            list.innerHTML = "";
+            const todos = loadTodos();
+
+            todos.forEach((todo, index) => {
+                const listItem = document.createElement("li");
+                listItem.className = "list-group-item";
+
+                const todoText = document.createElement("span");
+                todoText.innerText = `${index + 1}. ${todo}`;
+
+                const xbtn = document.createElement("button");
+                xbtn.className = "btn-close";
+                xbtn.onclick = () => deleteTodo(index);
+
+                const img = document.createElement("img");
+                img.src = "https://cdn-icons-png.flaticon.com/512/75/75519.png";
+                img.alt = "삭제";
+
+                xbtn.appendChild(img);
+                listItem.appendChild(todoText);
+                listItem.appendChild(xbtn);
+                list.appendChild(listItem);
+            });
+        }
+
+        function addItem() {
+            const todo = document.getElementById("item").value.trim();
+            if (!todo) return;
+
+            const todos = loadTodos();
+            todos.push(todo);
+            saveTodos(todos);
+            renderTodos();
+
+            document.getElementById("item").value = "";
+            document.getElementById("item").focus();
+        }
+
+        function deleteTodo(index) {
+            const todos = loadTodos();
+            todos.splice(index, 1);
+            saveTodos(todos);
+            renderTodos();
+        }
+
+        window.onload = renderTodos;
+    </script>
+</body>
+
+</html>
